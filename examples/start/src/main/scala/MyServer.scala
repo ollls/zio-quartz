@@ -193,9 +193,7 @@ object myServer extends zio.App {
           case req @ GET -> Root / "files" / StringVar( filename ) => 
 
           for {
-              _ <- ZIO( println( "****") )
               stream <- FileUtils.httpFileStream( req, ROOT_CATALOG )
-             // _      <- stream.foreachChunk( chunk => Channel.write( req.ch, chunk ) )
           } yield( Response.raw_stream( stream ) )
           
        
@@ -245,7 +243,7 @@ object myServer extends zio.App {
     myHttp
       .run(myHttpRouter.route)
       .provideSomeLayer[ZEnv with MyLogging](AttributeLayer)
-      .provideSomeLayer[ZEnv](MyLogging.make(("console" -> LogLevel.Trace), ("access" -> LogLevel.Info)))
+      .provideSomeLayer[ZEnv](MyLogging.make(("console" -> LogLevel.Trace), ("access" -> LogLevel.Trace)))
       .exitCode
   }
 }

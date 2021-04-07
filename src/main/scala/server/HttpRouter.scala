@@ -70,8 +70,8 @@ class HttpRouter[R <: Has[MyLogging.Service]](val appRoutes: List[HttpRoutes[R]]
         //we will ignore trailing block here, but it can be provided, right after empty block for further use.
         //TODO
         val trailingHeaders = new String(in.slice(pos + 2, splitAt).toArray)
-        println("start = " + (pos + 2).toString() + "splitAt = " + splitAt)
-        println("trailingHeaders = " + trailingHeaders)
+        //println("start = " + (pos + 2).toString() + "splitAt = " + splitAt)
+        //println("trailingHeaders = " + trailingHeaders)
         true
       } else throw new BadInboundDataError()
       true
@@ -85,7 +85,7 @@ class HttpRouter[R <: Has[MyLogging.Service]](val appRoutes: List[HttpRoutes[R]]
       var idx: Int      = 0
       var stop: Boolean = false
 
-      println(" --->  chunkedDecode")
+      //println(" --->  chunkedDecode")
 
       //extract size
       while (idx < in.size && stop == false) {
@@ -99,26 +99,26 @@ class HttpRouter[R <: Has[MyLogging.Service]](val appRoutes: List[HttpRoutes[R]]
         }
       }
 
-      println("split At =  " + splitAt + " idx = " + idx)
+      //println("split At =  " + splitAt + " idx = " + idx)
 
       val str_str = new String(in.slice(0, splitAt).toArray)
 
-      println(">>> " + str_str)
+     // println(">>> " + str_str)
 
       val chunkSize = Integer.parseInt(new String(in.slice(0, splitAt).toArray), 16)
 
-      println("chunkSize = " + chunkSize)
-      println("stream chunkSize = " + in.size)
+     // println("chunkSize = " + chunkSize)
+     // println("stream chunkSize = " + in.size)
 
       if (chunkSize > 0 && chunkSize < in.size - idx + 2 + 1) {
 
         val chunk = in.slice(splitAt + 2, splitAt + 2 + chunkSize)
 
-        println("c = " + (splitAt + 2 + chunkSize + 2).toInt + " with " + in.size)
+      //  println("c = " + (splitAt + 2 + chunkSize + 2).toInt + " with " + in.size)
 
         val leftOver = in.slice(splitAt + 2 + chunkSize + 2, in.size)
 
-        println("leftOver = " + new String(leftOver.toArray) + "leftOver size = " + leftOver.size)
+       // println("leftOver = " + new String(leftOver.toArray) + "leftOver size = " + leftOver.size)
 
         (Some(chunk), leftOver, false)
       } else {
@@ -135,7 +135,7 @@ class HttpRouter[R <: Has[MyLogging.Service]](val appRoutes: List[HttpRoutes[R]]
         .map(stateRef => {
           case None =>
             var res: Chunk[Chunk[Byte]] = Chunk.empty
-            println("none in <----")
+         //   println("none in <----")
             (for {
               leftOver <- stateRef.get
               pair     <- ZIO.effectTotal(produceChunk(leftOver))
@@ -147,7 +147,7 @@ class HttpRouter[R <: Has[MyLogging.Service]](val appRoutes: List[HttpRoutes[R]]
 
           case Some(in) =>
             var res: Chunk[Chunk[Byte]] = Chunk.empty
-            println("some in <----")
+         //   println("some in <----")
             var start = true
             (for {
               leftOver <- stateRef.get
@@ -245,7 +245,7 @@ class HttpRouter[R <: Has[MyLogging.Service]](val appRoutes: List[HttpRoutes[R]]
               val T = for {
                 h <- hdrs
 
-                _         <- ZIO.succeed(println(h.printHeaders))
+                //_         <- ZIO.succeed(println(h.printHeaders))
                 isChunked <- ZIO.effectTotal(h.getMval("transfer-encoding").exists(_.equalsIgnoreCase("chunked")))
 
                 validate <- ZIO.effectTotal(
@@ -335,7 +335,9 @@ class HttpRouter[R <: Has[MyLogging.Service]](val appRoutes: List[HttpRoutes[R]]
       val status = resp.code
 
       if( resp.isChunked ) {
-          ResponseWriters.writeFullResponseFromStream( req.ch, resp ).refineToOrDie[Exception].map( _ => 0 )  
+          Logs.log_access(req, status, 0 ).refineToOrDie[Exception] *>
+          ResponseWriters.writeFullResponseFromStream( req.ch, resp ).refineToOrDie[Exception].map( _ => 0 )
+          //refineToOrDie[Exception]  
       } else 
       (for {
         body  <- resp.body.flatMap( c => ZStream.fromChunk( c )).runCollect
