@@ -133,7 +133,9 @@ object myServer extends zio.App {
       //ZIO(Response.Ok.asTextBody( sylo.remove( name ).toString ) )
 
       case GET -> Root / "test" =>
-        ZIO(Response.Ok.asJsonBody(DataBlock("Thomas", "1001 Dublin Blvd", Chunk("red", "blue", "green"))))
+        ZIO(Response.Ok.
+        asJsonBody(DataBlock("Thomas", "1001 Dublin Blvd", Chunk("red", "blue", "green")))
+        .transferEncoding( "chunked") )
 
       case req @ POST -> Root / "test" =>
         for {

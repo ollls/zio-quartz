@@ -31,12 +31,12 @@ class HttpRouter[R <: Has[MyLogging.Service]](val appRoutes: List[HttpRoutes[R]]
     this(rt.toList)
   }
 
-  //MAX SIZE for current implementation: 16676 ( one TLS app packet ) - do not exceed.
 
   //TODO enforce those !!!!
   //val HTTP_HEADER_SZ          = 8096 * 2
   //val MAX_ALLOWED_CONTENT_LEN = 1048576 * 100
 
+  /*****************************************************************/
   //So the last chunk and 2 trailing headers might look like this:
   //0<CRLF>
   //Date:Sun, 06 Nov 1994 08:49:37 GMT<CRLF>
@@ -275,7 +275,6 @@ class HttpRouter[R <: Has[MyLogging.Service]](val appRoutes: List[HttpRoutes[R]]
                              body_stream
                                .take(contentLenL)
                                .grouped(Int.MaxValue) //this will be configurable
-                             //.aggregate(ZTransducer.foldLeft(Chunk[Byte]())((o, byte) => o :+ byte))
                            )
 
                 req <- ZIO.effect(Request(h, stream, c)).refineToOrDie[Exception]
