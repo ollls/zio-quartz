@@ -1,10 +1,9 @@
-val ZioVersion    = "1.0.3"
+val ZioVersion    = "1.0.5"
 val Specs2Version = "4.7.0"
 
 resolvers += Resolver.sonatypeRepo("releases")
 resolvers += Resolver.sonatypeRepo("snapshots")
 
-ThisBuild / organization := "io.github.ollls"
 ThisBuild / organizationName := "ollls"
 ThisBuild / organizationHomepage := Some(url("https://github.com/ollls/zio-tls-http"))
 
@@ -43,15 +42,14 @@ ThisBuild / publishMavenStyle := true
   lazy val root = (project in file("."))
   .settings(
     organization := "io.github.ollls",
-    name := "zio-tls-http",
-    version := "1.1.0-m9",
+    name := "zio-quartz",
+    version := "0.1-m1",
     scalaVersion := "2.13.1",
     maxErrors := 3,
     retrieveManaged := true,
     libraryDependencies ++= Seq(
       "dev.zio"    %% "zio"         % ZioVersion,
       "dev.zio" %% "zio-json" % "0.0.1",
-      "dev.zio" %% "zio-streams" % "1.0.0-RC17",
       "dev.zio" %% "zio-test" % ZioVersion % Test,
       "dev.zio" %% "zio-test-sbt" % ZioVersion % Test
     ),
