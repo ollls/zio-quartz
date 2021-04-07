@@ -1,4 +1,4 @@
-# zio-quartz - native ZIO-NIO-TLS streaming with HTTP1.1.
+# zio-quartz - native ZIO-NIO-TLS streaming with HTTP/1.1.
 
 zio-tls-http rewritten with ZStream.
 * TLS with ZIO effects and ZStream on top, HTTP Response/Request represented as ZStream.
