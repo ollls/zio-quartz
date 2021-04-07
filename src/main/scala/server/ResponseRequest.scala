@@ -77,6 +77,8 @@ sealed case class Response(
     new Response(this.code, this.headers + pair, this.body)
   }
 
+  def asStream( s0 : ZStream[ZEnv, Throwable, Chunk[Byte]]) = new Response(this.code, this.headers, s0)
+
   def asTextBody(text: String): Response = {
     val s0 = ZStream(Chunk.fromArray(text.getBytes))
     new Response(this.code, this.headers, s0).contentType(ContentType.Plain)

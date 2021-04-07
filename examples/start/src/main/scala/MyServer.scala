@@ -6,6 +6,8 @@ import zhttp._
 import zhttp.dsl._
 import zio.Has
 
+import zio.stream.ZStream
+
 import java.time.ZonedDateTime
 
 import zio.blocking._
@@ -133,9 +135,13 @@ object myServer extends zio.App {
       //ZIO(Response.Ok.asTextBody( sylo.remove( name ).toString ) )
 
       case GET -> Root / "test" =>
-        ZIO(Response.Ok.
-        asJsonBody(DataBlock("Thomas", "1001 Dublin Blvd", Chunk("red", "blue", "green")))
-        .transferEncoding( "chunked") )
+        val d1 = DataBlock("Thomas", "1001 Dublin Blvd", Chunk("red", "blue", "green") )
+        val d2 = DataBlock("John", "1001 Caleveras", Chunk( "green" ) )
+        val in = ZStream(  d1, d2 ).map( obj => Chunk.fromArray( obj.toJson.getBytes() ) ) 
+
+        ZIO(Response.Ok.asStream( in ).transferEncoding( "chunked") )
+        //asJsonBody( DataBlock("Thomas", "1001 Dublin Blvd", Chunk("red", "blue", "green")))
+        //.transferEncoding( "chunked") )
 
       case req @ POST -> Root / "test" =>
         for {
